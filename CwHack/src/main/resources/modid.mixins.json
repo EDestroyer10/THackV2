@@ -1,0 +1,30 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "optimizer.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "mixins": [
+  ],
+  "client": [
+    "AbstractBlockStateMixin",
+    "CameraMixin",
+    "ChunkOcclusionDataBuilderMixin",
+    "ClientPlayerEntityMixin",
+    "ClientPlayerInteractionManagerMixin",
+    "ClientPlayNetworkHandlerMixin",
+    "ClientWorldMixin",
+    "EntityRendererMixin",
+    "InGameHudMixin",
+    "KeyboardMixin",
+    "LivingEntityRendererMixin",
+    "Matrix4fMixin",
+    "MinecraftClientMixin",
+    "MouseMixin",
+    "WorldMixin",
+    "NoHurtCamMixin",
+    "ClientAccessorMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

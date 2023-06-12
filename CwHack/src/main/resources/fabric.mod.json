@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "id": "walksycrystaloptimizer",
+  "version": "${version}",
+
+  "name": "Walksy Optimizer",
+  "description": "Allows you to place crystals much faster",
+  "authors": [
+    "Walksy"
+  ],
+  "contact": {
+    "homepage": "https://github.com/Walksy"
+  },
+  "license": "CC0-1.0",
+  "icon": "assets/modid/icon.png",
+
+  "environment": "*",
+  "entrypoints": {
+    "client": [
+      "optimizer.ClientInitializer"
+    ]
+  },
+  "mixins": [
+    "modid.mixins.json"
+  ],
+
+  "depends": {
+    "fabricloader": ">=0.14.9",
+    "fabric": "*",
+    "minecraft": "1.19.x",
+    "java": ">=17"
+  }
+}
