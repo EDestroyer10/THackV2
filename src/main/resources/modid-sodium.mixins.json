@@ -1,0 +1,12 @@
+{
+  "required": false,
+  "package": "ubl.nohurtcam.mixin.sodium",
+  "compatibilityLevel": "JAVA_17",
+  "plugin": "ubl.nohurtcam.MixinPlugin",
+  "client": [
+    "SodiumBlockOcclusionCacheMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
