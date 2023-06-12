@@ -5,7 +5,7 @@ import eu.midnightdust.lib.config.MidnightConfig;
 import net.minecraft.client.gui.screen.ChatScreen;
 
 import java.util.List;
-//I did some testing
+//Test2
 public class BlurConfig extends MidnightConfig {
     public static final String style = "style";
     public static final String screens = "screens";
