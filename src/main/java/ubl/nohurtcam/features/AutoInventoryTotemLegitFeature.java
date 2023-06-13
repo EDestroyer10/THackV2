@@ -1,15 +1,16 @@
 package ubl.nohurtcam.features;
 
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.item.Items;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
-import org.lwjgl.glfw.GLFW;
 import ubl.nohurtcam.events.UpdateListener;
 import ubl.nohurtcam.feature.Feature;
-import ubl.nohurtcam.keybind.Keybind;
-import ubl.nohurtcam.setting.BooleanSetting;
 import ubl.nohurtcam.setting.IntegerSetting;
+import ubl.nohurtcam.utils.AccessorUtils;
 
 import static ubl.nohurtcam.NoHurtCam.MC;
 
@@ -18,22 +19,12 @@ public class AutoInventoryTotemLegitFeature extends Feature implements UpdateLis
     private final IntegerSetting delay = new IntegerSetting("delay", "delay", 1, this);
 
 
-    private final IntegerSetting totemSlot = new IntegerSetting("totemSlot", "totemSlot", 9, this);
+    private final IntegerSetting totemSlot = new IntegerSetting("totemSlot", "totemSlot", 8, this);
 
 
-    private final BooleanSetting activateOnKey = new BooleanSetting("activateOnKey", "activateOnKey", false, this);
-
-
-    private final Keybind activateKey = new Keybind(
-            "Keybind",
-            GLFW.GLFW_KEY_V,
-            false,
-            false,
-            null
-    );
 
     public AutoInventoryTotemLegitFeature() {
-        super("Legit Retotem", "Automatically puts on totems for you when you are in inventory");
+        super("AutoInventoryTotemLegit", "Automatically puts on totems for you when you are in inventory");
     }
 
     private int totemClock = 0;
@@ -52,12 +43,6 @@ public class AutoInventoryTotemLegitFeature extends Feature implements UpdateLis
         eventManager.remove(UpdateListener.class, this);
     }
 
-    private boolean check() {
-        return (activateOnKey.getValue()
-                && (GLFW.glfwGetKey(MC.getWindow().getHandle(),
-                activateKey.getKey()) == GLFW.GLFW_PRESS))
-                || (!activateOnKey.getValue());
-    }
 
     @Override
     public void onUpdate() {
@@ -66,9 +51,9 @@ public class AutoInventoryTotemLegitFeature extends Feature implements UpdateLis
 
             InventoryScreen invScreen = (InventoryScreen) MC.currentScreen;
 
-            if (getFocusedSlot(invScreen) != null && check()) {
+            if (getFocusedSlot() != null) {
 
-                int slot = getFocusedSlot(invScreen).getIndex();
+                int slot = getFocusedSlot().getIndex();
 
                 if (slot <= 35) {
                     if (!isTotem(totemSlot.getValue() - 1) && isTotem(slot)) {
@@ -112,9 +97,11 @@ public class AutoInventoryTotemLegitFeature extends Feature implements UpdateLis
 
     }
 
-    private Slot getFocusedSlot(InventoryScreen screen) {
-        //return screen.focusedSlot();
-        return null;
+    private Slot getFocusedSlot() {
+        final Screen screen = MinecraftClient.getInstance().currentScreen;
+        final HandledScreen<?> gui = (HandledScreen<?>) screen;
+        final Slot slot = AccessorUtils.getSlotUnderMouse(gui);
+        return slot;
     }
 
     private boolean isTotem(int slot) {

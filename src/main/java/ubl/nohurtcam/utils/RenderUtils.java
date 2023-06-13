@@ -1,13 +1,14 @@
 package ubl.nohurtcam.utils;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.*;
 import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
+import ubl.nohurtcam.mixin.WorldRendererAccessor;
 
 import static ubl.nohurtcam.NoHurtCam.MC;
 
@@ -25,9 +26,115 @@ public enum RenderUtils
 		immediate.draw();
 	}
 
-	public static void drawBoxBoth(Box box, QuadColor color, float lineWidth) {
+	public static void drawBoxBoth(BlockPos blockPos, QuadColor color, Box box, float lineWidth, Direction... excludeDirs) {
+		drawBoxBoth(new Box(blockPos), color, lineWidth, excludeDirs);
 		BlockPos BlockPos = null;
 		drawBoxBoth(new Box(BlockPos), color, lineWidth);
+	}
+
+	public static void drawBoxBoth(Box box, QuadColor color, float lineWidth, Direction... excludeDirs) {
+		QuadColor outlineColor = color.clone();
+		outlineColor.overwriteAlpha(255);
+
+		drawBoxBoth(box, color, outlineColor, lineWidth, excludeDirs);
+	}
+
+	public static void drawBoxBoth(BlockPos blockPos, QuadColor fillColor, QuadColor outlineColor, float lineWidth, Direction... excludeDirs) {
+		drawBoxBoth(new Box(blockPos), fillColor, outlineColor, lineWidth, excludeDirs);
+	}
+
+	public static void drawBoxBoth(Box box, QuadColor fillColor, QuadColor outlineColor, float lineWidth, Direction... excludeDirs) {
+		drawBoxFill(box, fillColor, excludeDirs);
+		drawBoxOutline(box, outlineColor, lineWidth, excludeDirs);
+	}
+
+	public static Frustum getFrustum() {
+		return ((WorldRendererAccessor) MinecraftClient.getInstance().worldRenderer).getFrustum();
+	}
+
+	public static void drawBoxFill(Box box, QuadColor color, Direction... excludeDirs) {
+		if (!getFrustum().isVisible(box)) {
+			return;
+		}
+
+		setup3DRender(true);
+
+		MatrixStack matrices = matrixFrom(box.minX, box.minY, box.minZ);
+
+		Tessellator tessellator = Tessellator.getInstance();
+		BufferBuilder buffer = tessellator.getBuffer();
+
+		// Fill
+		RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+
+		buffer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
+		Vertexer.vertexBoxQuads(matrices, buffer, Boxes.moveToZero(box), color, excludeDirs);
+		tessellator.draw();
+
+		end3DRender();
+	}
+
+	public static MatrixStack matrixFrom(double x, double y, double z) {
+		MatrixStack matrices = new MatrixStack();
+
+		Camera camera = MinecraftClient.getInstance().gameRenderer.getCamera();
+
+
+		matrices.translate(x - camera.getPos().x, y - camera.getPos().y, z - camera.getPos().z);
+
+		return matrices;
+	}
+
+	public static Box moveToZero(Box box) {
+		return box.offset(getMinVec(box).negate());
+	}
+
+	public static Vec3d getMinVec(Box box) {
+		return new Vec3d(box.minX, box.minY, box.minZ);
+	}
+
+	public static void setup3DRender(boolean disableDepth) {
+		RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+		RenderSystem.enableBlend();
+		RenderSystem.defaultBlendFunc();
+		if (disableDepth)
+			RenderSystem.disableDepthTest();
+		RenderSystem.depthMask(MinecraftClient.isFabulousGraphicsOrBetter());
+		RenderSystem.enableCull();
+	}
+
+	public static void end3DRender() {
+		RenderSystem.disableCull();
+		RenderSystem.disableBlend();
+		RenderSystem.enableDepthTest();
+		RenderSystem.depthMask(true);
+		RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+	}
+
+	public static void drawBoxOutline(Box box, QuadColor color, float lineWidth, Direction... excludeDirs) {
+		if (!getFrustum().isVisible(box)) {
+			return;
+		}
+
+		setup3DRender(true);
+
+		MatrixStack matrices = matrixFrom(box.minX, box.minY, box.minZ);
+
+		Tessellator tessellator = Tessellator.getInstance();
+		BufferBuilder buffer = tessellator.getBuffer();
+
+		// Outline
+		RenderSystem.disableCull();
+		RenderSystem.setShader(GameRenderer::getRenderTypeLinesProgram);
+		RenderSystem.lineWidth(lineWidth);
+
+		buffer.begin(VertexFormat.DrawMode.LINES, VertexFormats.LINES);
+		Vertexer.vertexBoxLines(matrices, buffer, Boxes.moveToZero(box), color, excludeDirs);
+		tessellator.draw();
+
+		RenderSystem.enableCull();
+
+		end3DRender();
 	}
 
 	public static void bindTexture(Identifier identifier) {

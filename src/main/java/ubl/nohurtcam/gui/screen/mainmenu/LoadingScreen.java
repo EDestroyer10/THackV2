@@ -17,7 +17,7 @@ public class LoadingScreen extends ResourceTexture {
 
     protected TextureData loadTextureData(ResourceManager resourceManager) {
         try {
-            InputStream input = LoadingScreen.class.getResourceAsStream("/assets/optimizer/monkeymod.png");
+            InputStream input = LoadingScreen.class.getResourceAsStream("/assets/optimizer/icon.png");
             TextureData texture = null;
 
             if( input != null ) {

@@ -50,6 +50,8 @@ public class FeatureList
 	public final AutoHitCrystalFeature autoHitCrystalFeature = new AutoHitCrystalFeature();
 	public final AntiDoubleTapFeature antiDoubleTapFeature = new AntiDoubleTapFeature();
 	public final ESPFeature espFeature = new ESPFeature();
+	public final AutoInventoryTotemLegitFeature autoInventoryTotemLegitFeature = new AutoInventoryTotemLegitFeature();
+	public final StorageESPFeature storageESPFeature = new StorageESPFeature();
 	private HashMap<String, Feature> features = new HashMap<>();
 
 	public FeatureList()
